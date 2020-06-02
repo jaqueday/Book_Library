@@ -13,6 +13,7 @@ import pandas as pd
 SERVICE = 'openl'
 
 library = []
+isbn_list = []
 csv_columns = ['ISBN-13', 'Title', 'Authors', 'Publisher', 'Year', 'Language']
 filename = 'books.csv'
 
@@ -22,32 +23,34 @@ def menu():
     menu = (f"\nBook Library Manager Options"
             f"\n-------------------------------"
             f"\n1. Add book"
-            f"\n2. View library"
-            f"\n3. Export CSV"
-            f"\n4. Exit"
+            f"\n2. View books added in this session"
+            f"\n3. Export books added to CSV"
+            f"\n4. Check books in CSV file"
+            f"\n9. Exit"
             f"\n>> ")
     menu_choice = get_from_user.positive_int(menu)
     return menu_choice
 
 
 def read_library():
-    """ Use of pandas
-    to read csv"""
-    df = pd.read_csv(filename)
-    return df
-
+    """ Check books in
+    the library list"""
+    for item in library:
+        book = item['Title']
+        isbn_list.append(item['ISBN-13'])
+        print(book, isbn_list)
+    return isbn_list
 
 def add_book():
     """ Get from user
     book ISBN """
-    try:
-        isbn = get_from_user.any_string('Type the book ISBN: ')
-        book = (meta(isbn, SERVICE))
-        print(f"Book: {book['Title']}"
-              f"\nAdded to library, please export to save to file")
-        return book
-    except:
-        print('Book not found')
+    isbn = get_from_user.any_string('Type the book ISBN: ')
+    book = (meta(isbn, SERVICE))
+    book_name = book['Title']
+    library.append(book)
+    print(f"Book: {book_name}"
+          f"\nAdded to library, please export to save to file")
+
 
 
 def to_csv(library):
@@ -66,16 +69,14 @@ def to_csv(library):
 
 def main():
     while True:
-        df = read_library()
         choice = menu()
         if choice == 1:
-            book = add_book()
-            library.append(book)
+            add_book()
         elif choice == 2:
-            print(df['Title'])
+            read_library()
         elif choice == 3:
             to_csv(library)
-        elif choice == 4:
+        elif choice == 9:
             exit()
 
 
