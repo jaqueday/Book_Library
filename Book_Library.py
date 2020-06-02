@@ -5,6 +5,8 @@ JRDay
 """
 
 from isbnlib import meta
+from isbnlib.dev import DataNotFoundAtServiceError
+
 import get_from_user
 import csv
 import os
@@ -16,6 +18,8 @@ library = []
 isbn_list = []
 csv_columns = ['ISBN-13', 'Title', 'Authors', 'Publisher', 'Year', 'Language']
 filename = 'books.csv'
+
+pd.options.display.max_colwidth = 90  # set a value as your need
 
 
 def menu():
@@ -37,20 +41,25 @@ def read_library():
     the library list"""
     for item in library:
         book = item['Title']
-        isbn_list.append(item['ISBN-13'])
-        print(book, isbn_list)
-    return isbn_list
+        print(f"- {book}")
+
 
 def add_book():
     """ Get from user
     book ISBN """
-    isbn = get_from_user.any_string('Type the book ISBN: ')
-    book = (meta(isbn, SERVICE))
-    book_name = book['Title']
-    library.append(book)
-    print(f"Book: {book_name}"
-          f"\nAdded to library, please export to save to file")
-
+    try:
+        isbn = get_from_user.any_string('Type the book ISBN: ')
+        book = (meta(isbn, SERVICE))
+        book_isbn = book['ISBN-13']
+        if book_isbn in isbn_list:
+            print('Book already in list')
+        else:
+            library.append(book)
+            isbn_list.append(book_isbn)
+            print(f"Book: {book['Title']}"
+                  f"\nAdded to library, please export to save to file")
+    except DataNotFoundAtServiceError:
+        print('Book not found in online library')
 
 
 def to_csv(library):
@@ -67,6 +76,16 @@ def to_csv(library):
             writer.writerow(item)
 
 
+def read_csv():
+    """ Use Pandas to
+    read CSV file"""
+    df = pd.read_csv(filename)
+    # dropping ALL duplicte values
+    #df.drop_duplicates( keep='first', inplace=True)
+    #df.to_csv(filename, index=False)
+    print(df['Title'])
+
+
 def main():
     while True:
         choice = menu()
@@ -76,6 +95,8 @@ def main():
             read_library()
         elif choice == 3:
             to_csv(library)
+        elif choice == 4:
+            read_csv()
         elif choice == 9:
             exit()
 
