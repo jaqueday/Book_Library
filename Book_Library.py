@@ -16,7 +16,7 @@ SERVICE = 'openl'
 
 library = []
 isbn_list = []
-csv_columns = ['ISBN-13', 'Title', 'Authors', 'Publisher', 'Year', 'Language']
+csv_columns = ['ISBN-13', 'Title', 'Authors', 'Publisher', 'Year', 'Language', 'Owner']
 filename = 'books.csv'
 
 pd.options.display.max_colwidth = 90  # set a value as your need
@@ -37,16 +37,14 @@ def menu():
 
 
 def read_library():
-    """ Check books in
-    the library list"""
+    """ Check books in the library list"""
     for item in library:
         book = item['Title']
         print(f"- {book}")
 
 
 def add_book():
-    """ Get from user
-    book ISBN """
+    """ Get from user book ISBN """
     try:
         isbn = get_from_user.any_string('Type the book ISBN: ')
         book = (meta(isbn, SERVICE))
@@ -63,8 +61,7 @@ def add_book():
 
 
 def to_csv(library):
-    """ Export books
-    to a CSV file"""
+    """ Export books to a CSV file"""
     with open('books.csv', 'a', newline='') as output:
         # Variable to check if file exists
         file_is_empty = os.stat('books.csv').st_size == 0
@@ -77,12 +74,11 @@ def to_csv(library):
 
 
 def read_csv():
-    """ Use Pandas to
-    read CSV file"""
-    df = pd.read_csv(filename)
-    # dropping ALL duplicte values
-    #df.drop_duplicates( keep='first', inplace=True)
-    #df.to_csv(filename, index=False)
+    """ Use Pandas to read CSV file"""
+    df = pd.read_csv(filename, index_col=False)
+    # dropping ALL duplicate values
+    df.drop_duplicates( keep='first', inplace=True)
+    df.to_csv(filename, index=False)
     print(df['Title'])
 
 
